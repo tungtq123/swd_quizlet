@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flashcard Quiz — Software Engineering</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex; flex-direction: column; align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff; padding: 24px 16px 60px;
+    }
+    h1 { font-size: 1.6rem; color: #e2b96f; letter-spacing: 1px; margin-bottom: 4px; text-align: center; }
+    .subtitle { font-size: 0.82rem; color: #94a3b8; margin-bottom: 20px; }
+
+    /* Filter */
+    .filter-wrap { width: 100%; max-width: 740px; margin-bottom: 18px; }
+    .filter-wrap label { display: block; font-size: 0.72rem; color: #94a3b8; margin-bottom: 5px; letter-spacing: 1px; text-transform: uppercase; }
+    .filter-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    select { flex: 1; min-width: 200px; background: rgba(255,255,255,0.07); color: #fff; border: 1px solid rgba(255,255,255,0.18); border-radius: 10px; padding: 10px 14px; font-size: 0.88rem; cursor: pointer; outline: none; }
+    select option { background: #16213e; }
+    .btn-load { padding: 10px 22px; background: linear-gradient(135deg, #e2b96f, #f472b6); color: #1a1a2e; border: none; border-radius: 10px; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all .2s; }
+    .btn-load:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(226,185,111,.35); }
+
+    /* Stats */
+    .stats { width: 100%; max-width: 740px; display: flex; gap: 10px; margin-bottom: 14px; }
+    .stat { flex: 1; background: rgba(255,255,255,0.06); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+    .stat-val { font-size: 1.25rem; font-weight: 700; }
+    .stat-lbl { font-size: 0.72rem; color: #94a3b8; }
+    .stat.s-correct .stat-val { color: #4ade80; }
+    .stat.s-wrong   .stat-val { color: #f87171; }
+    .stat.s-remain  .stat-val { color: #e2b96f; }
+
+    /* Progress */
+    .progress-wrap { width: 100%; max-width: 740px; margin-bottom: 6px; }
+    .progress-bar-bg { height: 5px; background: rgba(255,255,255,0.08); border-radius: 999px; }
+    .progress-bar { height: 5px; background: linear-gradient(90deg,#e2b96f,#f472b6); border-radius: 999px; transition: width .4s; }
+    .progress-text { font-size: 0.78rem; color: #94a3b8; text-align: center; margin-bottom: 18px; }
+
+    /* Card */
+    .card { width: 100%; max-width: 740px; background: linear-gradient(145deg,#1e3a5f,#16305a); border: 1px solid rgba(226,185,111,0.25); border-radius: 20px; padding: 30px 36px 26px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); margin-bottom: 22px; }
+    .card-chapter { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: #e2b96f; opacity: 0.75; margin-bottom: 8px; }
+    .card-qnum { font-size: 0.78rem; color: #94a3b8; margin-bottom: 10px; }
+    .card-question { font-size: 1.05rem; font-weight: 700; color: #f1f5f9; line-height: 1.55; margin-bottom: 20px; }
+
+    /* Options */
+    .options { display: flex; flex-direction: column; gap: 9px; }
+    .option {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 12px 16px;
+      font-size: 0.9rem; color: #cbd5e1; line-height: 1.45;
+      cursor: pointer; transition: all .18s; user-select: none;
+    }
+    .option:hover:not(.disabled) { background: rgba(255,255,255,0.1); border-color: rgba(226,185,111,0.4); color: #fff; }
+    .option.disabled { cursor: not-allowed; }
+    .option-key { min-width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #e2b96f; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .18s; }
+
+    .option.correct { background: rgba(34,197,94,0.15); border-color: #4ade80; color: #bbf7d0; }
+    .option.correct .option-key { background: #4ade80; color: #14532d; }
+    .option.wrong   { background: rgba(239,68,68,0.15);  border-color: #f87171; color: #fecaca; }
+    .option.wrong   .option-key { background: #f87171; color: #7f1d1d; }
+
+    /* Feedback */
+    .feedback { display: none; margin-top: 16px; border-radius: 12px; padding: 12px 18px; font-weight: 700; font-size: 0.9rem; align-items: center; gap: 8px; }
+    .feedback.show { display: flex; }
+    .feedback.ok  { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.35); color: #4ade80; }
+    .feedback.err { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.35);  color: #f87171; }
+
+    /* Simple (answer-only) */
+    .card.simple { text-align: center; }
+    .simple-qnum { font-size: 2rem; font-weight: 700; color: #f1f5f9; margin: 8px 0 4px; }
+    .simple-note { font-size: 0.78rem; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
+    .simple-ans { display: none; margin-top: 12px; }
+    .simple-ans.show { display: block; }
+    .ans-circle { display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg,#e2b96f,#f472b6); color: #1a1a2e; font-size: 2rem; font-weight: 900; }
+    .btn-reveal { margin-top: 14px; padding: 11px 32px; border-radius: 12px; border: none; cursor: pointer; background: linear-gradient(135deg,#e2b96f,#f472b6); color: #1a1a2e; font-weight: 700; font-size: 0.9rem; transition: all .2s; }
+    .btn-reveal:hover { transform: translateY(-2px); }
+    .btn-reveal:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* Nav */
+    .nav-row { display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+    button { cursor: pointer; transition: all .2s; }
+    .btn-nav { padding: 11px 26px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #fff; font-size: 0.9rem; font-weight: 600; }
+    .btn-nav:hover:not(:disabled) { background: rgba(255,255,255,0.18); transform: translateY(-2px); }
+    .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+    .bottom-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .btn-sm { padding: 9px 16px; border-radius: 10px; font-size: 0.78rem; font-weight: 600; background: rgba(255,255,255,0.06); color: #94a3b8; border: 1px solid rgba(255,255,255,0.1); }
+    .btn-sm:hover { background: rgba(255,255,255,0.14); color: #fff; }
+  </style>
+</head>
+<body>
+
+<h1>Software Engineering Flashcards</h1>
+<p class="subtitle">Chọn đáp án · ← → chuyển câu · R = Xáo trộn</p>
+
+<div class="filter-wrap">
+  <label>Chọn Chapter</label>
+  <div class="filter-row">
+    <select id="chapterSelect">
+      <option value="all">Tất cả (20 chapters)</option>
+      <option value="0">Chapter 1: Introduction</option>
+      <option value="1">Chapter 2: Overview of the UML Notation</option>
+      <option value="2">Chapter 3: Software Life Cycle Models and Processes</option>
+      <option value="3">Chapter 4: Software Design and Architecture Concepts</option>
+      <option value="4">Chapter 5: Overview of Software Modeling and Design Method</option>
+      <option value="5">Chapter 6: Use Case Modeling</option>
+      <option value="6">Chapter 7: Static Modeling</option>
+      <option value="7">Chapter 8: Object and Class Structuring</option>
+      <option value="8">Chapter 9: Dynamic Interaction Modeling</option>
+      <option value="9">Chapter 10: Finite State Machines</option>
+      <option value="10">Chapter 11: State-Dependent Dynamic Interaction Modeling</option>
+      <option value="11">Chapter 12: Overview of Software Architecture</option>
+      <option value="12">Chapter 13: Software Subsystem Architectural Design</option>
+      <option value="13">Chapter 14: Designing Object-Oriented Software Architectures</option>
+      <option value="14">Chapter 15: Designing Client/Server Software Architectures</option>
+      <option value="15">Chapter 16: Designing Service-Oriented Architectures</option>
+      <option value="16">Chapter 17: Designing Component-Based Software Architectures</option>
+      <option value="17">Chapter 18: Designing Concurrent and Real-Time Software Architectures</option>
+      <option value="18">Chapter 19: Designing Software Product Line Architectures</option>
+      <option value="19">Chapter 20: Software Quality Attributes</option>
+    </select>
+    <button class="btn-load" onclick="loadChapter()">Tải câu hỏi</button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat s-correct"><span class="stat-val" id="sCorrect">0</span><span class="stat-lbl">Đúng</span></div>
+  <div class="stat s-wrong">  <span class="stat-val" id="sWrong">0</span>  <span class="stat-lbl">Sai</span></div>
+  <div class="stat s-remain"> <span class="stat-val" id="sRemain">0</span> <span class="stat-lbl">Còn lại</span></div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar-bg"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+</div>
+<p class="progress-text" id="progressText">Câu 0 / 0</p>
+
+<div class="card" id="card"></div>
+
+<div class="nav-row">
+  <button class="btn-nav" id="btnPrev" onclick="changeCard(-1)">&#8592; Trước</button>
+  <button class="btn-nav" id="btnNext" onclick="changeCard(1)">Tiếp &#8594;</button>
+</div>
+<div class="bottom-btns">
+  <button class="btn-sm" onclick="shuffleCards()">⇌ Xáo trộn</button>
+  <button class="btn-sm" onclick="showOnlyWrong()">✗ Chỉ câu sai</button>
+  <button class="btn-sm" onclick="resetAll()">↺ Làm lại</button>
+</div>
+
+<script>
+const CHAPTERS = [
+  // ── Chapter 1 ──
+  { name:"Chapter 1: Introduction", questions:[
+    {q:"What is software modeling?",a:"Developing models of software.",b:"Designing software applications before coding.",c:"Developing software diagrams.",d:"Developing software prototypes.",answer:"b"},
+    {q:"What is the Unified Modeling Language?",a:"A programming language for describing object-oriented models.",b:"A diagramming tool for drawing object-oriented models.",c:"A graphical language for describing object-oriented models.",d:"A standardized graphical language and notation for describing object-oriented models.",answer:"d"},
+    {q:"What is a software architecture?",a:"The software inside a building.",b:"The structure of a client/server system.",c:"The overall structure of a software system.",d:"The software classes and their relationships.",answer:"c"},
+    {q:"What is a software design notation?",a:"Notes about the software design.",b:"A graphical or textual description of the software.",c:"Documentation of the software.",d:"A systematic approach for producing a design.",answer:"b"},
+    {q:"What is a software design concept?",a:"A graphical or textual description of the software.",b:"Documentation of the software.",c:"A fundamental idea that can be applied to designing a system.",d:"A systematic approach for producing a design.",answer:"c"},
+    {q:"What is a software design strategy?",a:"A graphical or textual description of the software.",b:"A fundamental idea that can be applied to designing a system.",c:"A systematic approach for producing a design.",d:"An overall plan and direction for developing a design.",answer:"d"},
+    {q:"What are software structuring criteria?",a:"Fundamental ideas that can be applied to designing a system.",b:"Systematic approaches for producing a design.",c:"Guidelines used to help in structuring a software system into its components.",d:"Overall plans for developing a design.",answer:"c"},
+    {q:"What is a software design method?",a:"A systematic approach for producing a design.",b:"Guidelines used to help in structuring a software system into its components.",c:"An overall plan for developing a design.",d:"A graphical or textual description of the software.",answer:"a"},
+    {q:"What is a platform-independent model (PIM)?",a:"A software platform before a commitment is made to a specific hardware platform.",b:"A precise model of the software architecture before a commitment is made to a specific platform.",c:"A precise model of the software architecture mapped to a specific platform.",d:"A graphical or textual description of the software.",answer:"b"},
+    {q:"What is a platform-specific model (PSM)?",a:"A specific hardware platform.",b:"A precise model of the software architecture before a commitment is made to a specific platform.",c:"A precise model of the software architecture mapped to a specific platform.",d:"A graphical or textual description of the software.",answer:"c"}
+  ]},
+  // ── Chapter 2 ──
+  { name:"Chapter 2: Overview of the UML Notation", questions:[
+    {q:"How is an actor depicted on a use case diagram?",a:"An oval.",b:"A stick figure.",c:"A box.",d:"A dashed line.",answer:"b"},
+    {q:"How is a use case depicted on a use case diagram?",a:"An oval.",b:"A stick figure.",c:"A box.",d:"A dashed line.",answer:"a"},
+    {q:"How is a class depicted on a class diagram?",a:"A box with one compartment.",b:"A box with one or two compartments.",c:"A box with one, two, or three compartments.",d:"An oval.",answer:"c"},
+    {q:"How is an association depicted on a class diagram?",a:"A solid line joining two class boxes.",b:"A dashed line joining two class boxes.",c:"A diamond touching the upper class box.",d:"An arrowhead touching the upper class box.",answer:"a"},
+    {q:"How is public visibility depicted for a class element on a class diagram?",a:"+ sign.",b:"– sign.",c:"# sign.",d:"* sign.",answer:"a"},
+    {q:"What are the two kinds of UML interaction diagrams?",a:"Class diagram and sequence diagram.",b:"Sequence diagram and communication diagram.",c:"Class diagram and communication diagram.",d:"Statechart and communication diagram.",answer:"b"},
+    {q:"What does an interaction diagram depict?",a:"Objects and links.",b:"Classes and relationships.",c:"Objects and messages.",d:"States and events.",answer:"c"},
+    {q:"What does a statechart diagram depict?",a:"Objects and links.",b:"Classes and relationships.",c:"Objects and messages.",d:"States and events.",answer:"d"},
+    {q:"What is a UML package?",a:"A box.",b:"A grouping of classes.",c:"A grouping of use cases.",d:"A grouping of model elements.",answer:"d"},
+    {q:"What does a deployment diagram depict?",a:"The physical configuration in terms of physical classes and physical connections.",b:"The physical configuration in terms of physical objects and physical connections.",c:"The physical configuration in terms of physical nodes and physical connections between the nodes.",d:"The physical configuration in terms of physical computers and physical networks.",answer:"c"}
+  ]},
+  // ── Chapter 3 ──
+  { name:"Chapter 3: Software Life Cycle Models and Processes", questions:[
+    {q:"What is a software life cycle?",a:"The life of the software.",b:"A cyclic approach to developing software.",c:"A phased approach to developing software.",d:"The life of software developed in cycles.",answer:"c"},
+    {q:"What is the waterfall life cycle model?",a:"Software developed under a waterfall.",b:"A process model in which each phase is completed before the next phase is started.",c:"A process model in which phases are overlapped.",d:"A process model in which phases are cyclic.",answer:"b"},
+    {q:"Which of the following is a limitation of the waterfall life cycle model?",a:"Software is developed in phases.",b:"Each phase is completed before the next phase is started.",c:"Software development is cyclic.",d:"Software requirements are not properly tested until a working system is available.",answer:"d"},
+    {q:"Which of the following approaches can overcome the limitation in the previous question?",a:"Phased software development.",b:"Throwaway prototyping.",c:"Evolutionary prototyping.",d:"Incremental development.",answer:"b"},
+    {q:"What is evolutionary prototyping?",a:"Phased software development.",b:"Throwaway prototyping.",c:"Risk-driven development.",d:"Incremental development.",answer:"d"},
+    {q:"What approach does the spiral model emphasize?",a:"Phased software development.",b:"Throwaway prototyping.",c:"Risk-driven development.",d:"Incremental development.",answer:"c"},
+    {q:"What is the goal of software validation?",a:"Building the system.",b:"Building the right system.",c:"Building the system right.",d:"Testing the system.",answer:"b"},
+    {q:"What is the goal of software verification?",a:"Building the system.",b:"Building the right system.",c:"Building the system right.",d:"Testing the system.",answer:"c"},
+    {q:"What is \"white box\" testing?",a:"Unit testing.",b:"Integration testing.",c:"Testing with knowledge of the system internals.",d:"Testing without knowledge of the software internals.",answer:"c"},
+    {q:"What is \"black box\" testing?",a:"System testing.",b:"Integration testing.",c:"Testing with knowledge of the system internals.",d:"Testing without knowledge of the software internals.",answer:"d"}
+  ]},
+  // ── Chapter 4 ──
+  { name:"Chapter 4: Software Design and Architecture Concepts", questions:[
+    {q:"Which of the following are object-oriented concepts?",a:"Modules and interfaces.",b:"Modules and information hiding.",c:"Classes, information hiding, and inheritance.",d:"Concurrency and information hiding.",answer:"c"},
+    {q:"Which of the following is a characteristic of an object?",a:"A function or subroutine.",b:"A module.",c:"Groups data and procedures that operate on the data.",d:"Groups a function and an algorithm.",answer:"c"},
+    {q:"What is a class?",a:"An object instance.",b:"The implementation of the object.",c:"A collection of objects with the same characteristics.",d:"A collection of objects with different characteristics.",answer:"c"},
+    {q:"What is an operation (also known as method) of a class?",a:"Specification and the implementation of a function performed by a class.",b:"Specification and the implementation of a subroutine provided by a class.",c:"Specification and the implementation of a function or procedure provided by a class.",d:"Specification and the implementation of an interface provided by a class.",answer:"c"},
+    {q:"What is the signature of an operation?",a:"The operation's name.",b:"The operation's function or subroutine.",c:"The operation's name, parameters, and return value.",d:"The object's interface.",answer:"c"},
+    {q:"What is the interface of a class?",a:"The signature of a class.",b:"The specification of operations provided by the class.",c:"The internals of the class.",d:"The implementation of the class.",answer:"b"},
+    {q:"What is an attribute?",a:"A description of a class.",b:"An internal property of a class.",c:"A data item held by a class.",d:"A parameter of a class.",answer:"c"},
+    {q:"What is information hiding in software design?",a:"Hiding information so that it cannot be found.",b:"Hiding a design decision that is considered likely to change.",c:"Hiding information to make it secure.",d:"Encapsulating data in a class.",answer:"b"},
+    {q:"What is data abstraction?",a:"Another name for information hiding.",b:"Encapsulating data so that its structure is hidden.",c:"Storing data in a database.",d:"Storing data in a data structure.",answer:"b"},
+    {q:"What is inheritance?",a:"A mechanism for inheriting characteristics from a parent.",b:"A mechanism for sharing and reusing code between classes.",c:"A mechanism for sharing data between classes.",d:"A mechanism for hiding information between classes.",answer:"b"}
+  ]},
+  // ── Chapter 5 ──
+  { name:"Chapter 5: Overview of Software Modeling and Design Method", questions:[
+    {q:"What is carried out during requirements modeling?",a:"Functional requirements of the system are described in terms of functions, inputs, and outputs.",b:"Functional requirements of the system are described in terms of actors and use cases.",c:"Functional requirements of the system are described textually.",d:"Functional requirements of the system are determined by interviewing users.",answer:"b"},
+    {q:"What is carried out during analysis modeling?",a:"Developing use case models.",b:"Developing data flow and entity-relationship diagrams.",c:"Developing static and dynamic models.",d:"Developing software architectures.",answer:"c"},
+    {q:"What is carried out during design modeling?",a:"Developing use case models.",b:"Developing data flow and entity-relationship diagrams.",c:"Developing static and dynamic models.",d:"Developing software architectures.",answer:"d"},
+    {q:"What is carried out during incremental software construction?",a:"Detailed design and coding of the classes in a subset of the system.",b:"Detailed design, coding, and unit testing of the classes in a subset of the system.",c:"Coding and unit testing of the classes in a subset of the system.",d:"Unit and integration testing of the classes in a subset of the system.",answer:"b"},
+    {q:"What is carried out during incremental software integration?",a:"Implementation of the classes in each software increment.",b:"Unit testing of the classes in each software increment.",c:"Integration testing of the classes in each software increment.",d:"System testing of the classes in each software increment.",answer:"c"},
+    {q:"What is carried out during system testing?",a:"White box testing.",b:"Black box testing.",c:"Unit testing.",d:"Integration testing.",answer:"b"}
+  ]},
+  // ── Chapter 6 ──
+  { name:"Chapter 6: Use Case Modeling", questions:[
+    {q:"What is a use case?",a:"A case study involving users.",b:"A sequence of interactions between the user and the system.",c:"A sequence of interactions between the user and the objects in the system.",d:"A sequence of user inputs to the system.",answer:"c"},
+    {q:"What is an actor in a use case?",a:"An object inside the system.",b:"A person who performs on stage.",c:"An external entity that interacts with the system.",d:"The customer to whom the system will be delivered.",answer:"c"},
+    {q:"What is a primary actor?",a:"The actor who goes on stage first.",b:"The actor that starts the use case.",c:"An actor that participates in the use case.",d:"An object inside the system.",answer:"b"},
+    {q:"What is a secondary actor?",a:"The actor who goes on stage second.",b:"The actor that starts the use case.",c:"An actor that participates in the use case.",d:"An object inside the system.",answer:"c"},
+    {q:"What is an alternative sequence in a use case?",a:"A sequence that describes an error case.",b:"A sequence that is different from the main sequence.",c:"A sequence that describes interactions with a secondary actor.",d:"A sequence that describes interactions with a primary actor.",answer:"b"},
+    {q:"What can an inclusion use case be used for?",a:"To describe an inclusive use case.",b:"To describe a lengthy interaction with an actor.",c:"To describe functionality that is common to more than one use case.",d:"To describe a use case that includes other use cases.",answer:"c"},
+    {q:"What can an extension use case be used for?",a:"To describe a lengthy interaction with an actor.",b:"To describe functionality that is common to more than one use case.",c:"To describe the functionality of a use case that is extended by another use case(s).",d:"To describe a conditional part of a different use case that is only executed under certain circumstances.",answer:"d"},
+    {q:"What can an activity diagram be used for in use case modeling?",a:"To depict the sequence of activities executed by all the use cases in the system.",b:"To depict the sequence of external activities that the use case interacts with.",c:"To depict the sequence of active objects in a use case.",d:"To depict the activities in the main and alternative sequences of a use case.",answer:"d"},
+    {q:"How can a nonfunctional requirement be described in a use case model?",a:"In a separate section of the use case description.",b:"As a use case precondition.",c:"As a use case postcondition.",d:"In a separate document.",answer:"a"},
+    {q:"What is a use case package?",a:"A package describing the actors in the system.",b:"A package describing the use cases in the system.",c:"A group of related use cases.",d:"The package of objects that participate in the use case.",answer:"c"}
+  ]},
+  // ── Chapter 7 ──
+  { name:"Chapter 7: Static Modeling", questions:[
+    {q:"What is a class?",a:"A course.",b:"An object instance.",c:"A client or server in the system.",d:"A collection of objects with the same characteristics.",answer:"d"},
+    {q:"What is an attribute?",a:"A relationship between two classes.",b:"A parameter of an operation or method.",c:"A data value held by an object in a class.",d:"The return value from an operation.",answer:"c"},
+    {q:"What is an association?",a:"A relationship between two classes.",b:"A relationship between two objects.",c:"A link between two classes.",d:"A link between two objects.",answer:"a"},
+    {q:"What is meant by the multiplicity of an association?",a:"The number of associations in a class.",b:"The number of associations between two classes.",c:"How many instances of one class relate to how many instances of another class.",d:"How many instances of one class relate to a single instance of another class.",answer:"d"},
+    {q:"What is an association class?",a:"A class with multiple associations.",b:"A class with one association.",c:"A class that models an association between two or more classes.",d:"A class that models an association between two or more objects.",answer:"c"},
+    {q:"What is a generalization/specialization hierarchy?",a:"A whole/part relationship.",b:"An inheritance relationship.",c:"An association between a generalized class and a specialized class.",d:"A layered hierarchy.",answer:"b"},
+    {q:"What is a composition hierarchy?",a:"A weak form of a generalization/specialization hierarchy.",b:"A strong form of a generalization/specialization hierarchy.",c:"A weak form of a whole/part relationship.",d:"A strong form of a whole/part relationship.",answer:"d"},
+    {q:"What is an aggregation hierarchy?",a:"A weak form of a generalization/specialization hierarchy.",b:"A strong form of a generalization/specialization hierarchy.",c:"A weak form of a whole/part relationship.",d:"A strong form of a whole/part relationship.",answer:"c"},
+    {q:"What does the system context class diagram define?",a:"The entity classes in the system.",b:"How the system interfaces to other systems.",c:"The boundary between the system and the external environment.",d:"The context classes in the system.",answer:"c"},
+    {q:"What is an entity class?",a:"A class on an entity/relationship diagram.",b:"A class that stores data.",c:"A class that interfaces to an external entity.",d:"An external class.",answer:"b"}
+  ]},
+  // ── Chapter 8 ──
+  { name:"Chapter 8: Object and Class Structuring", questions:[
+    {q:"What is a boundary object?",a:"An external object.",b:"An object that stores data.",c:"An object that communicates with an external object.",d:"An object that controls other objects.",answer:"c"},
+    {q:"What is a control object?",a:"An object that depends on other objects.",b:"An object that communicates with an external object.",c:"An object that controls other objects.",d:"An object that is controlled by other objects.",answer:"c"},
+    {q:"What is a state-dependent control object?",a:"An object that depends on a state machine.",b:"An object that communicates with a state machine.",c:"An object that controls a state machine.",d:"An object that executes a state machine.",answer:"d"},
+    {q:"What is a coordinator object?",a:"A manager object.",b:"An object that makes decisions based on a state machine.",c:"A decision-making object.",d:"An object that decides which entity object to interact with.",answer:"c"},
+    {q:"How would you determine a boundary class from the context diagram?",a:"By looking at it.",b:"By selecting the external classes on the context diagram.",c:"By determining the software classes that communicate with the external classes.",d:"By drawing the boundary between the hardware and software classes.",answer:"c"},
+    {q:"What is a timer object?",a:"An external clock.",b:"An internal clock.",c:"An object that is awakened by an external timer.",d:"An object that interacts with a clock.",answer:"c"},
+    {q:"What do class structuring criteria help with?",a:"Structuring an application into classes.",b:"Defining the attributes of a class.",c:"Defining the associations of a class.",d:"Defining the operations of a class.",answer:"a"},
+    {q:"What is the classification process for application classes analogous to?",a:"Categorizing books in a library.",b:"Deciding how many copies of a book are needed.",c:"Finding the classrooms in a school.",d:"Identifying what labs the school has.",answer:"a"},
+    {q:"What is the purpose of a stereotype in class structuring?",a:"To label a class according to its class structuring criterion.",b:"To identify the objects that belong to the same class.",c:"To distinguish between external objects and software objects.",d:"To identify the association between two classes.",answer:"a"},
+    {q:"What is a business logic object?",a:"An object used in business applications.",b:"An object that defines business-specific application logic.",c:"The internal logic of an object.",d:"A business object that determines whether a client request is logical.",answer:"b"}
+  ]},
+  // ── Chapter 9 ──
+  { name:"Chapter 9: Dynamic Interaction Modeling", questions:[
+    {q:"What does an interaction diagram depict?",a:"The state and transitions inside a control object.",b:"Classes and their relationships.",c:"Software objects and the sequence of their interactions.",d:"The external objects communicating with the system.",answer:"c"},
+    {q:"How is an actor depicted on an interaction diagram?",a:"An actor has an association with the interaction diagram.",b:"An actor can provide input to or receive output from a boundary object.",c:"An actor can provide input to or receive output from a boundary class.",d:"An instance of an actor can provide input to or receive output from a boundary object.",answer:"d"},
+    {q:"What does a sequence diagram depict?",a:"The sequence of external objects communicating with each other.",b:"Classes and their relationships.",c:"Software objects and the sequence of their interactions.",d:"The external objects communicating with the system.",answer:"c"},
+    {q:"What does a communication diagram depict?",a:"The sequence of external objects communicating with each other.",b:"Classes and their relationships.",c:"Software objects and the sequence of their interactions.",d:"The external objects communicating with the system.",answer:"c"},
+    {q:"What is the instance form of an interaction diagram?",a:"Depicts several object instances interacting with each other.",b:"Depicts one possible sequence of interactions among object instances.",c:"Depicts all possible interactions among object instances.",d:"Depicts all object instances and their links to each other.",answer:"b"},
+    {q:"What is the generic form of an interaction diagram?",a:"Depicts several objects interacting with each other.",b:"Depicts one possible sequence of interactions among objects.",c:"Depicts all possible interactions among objects.",d:"Depicts all classes and their associations with each other.",answer:"c"},
+    {q:"During dynamic interaction modeling, use cases are realized as follows:",a:"Determine objects that participate in each use case and the sequence of interactions among them.",b:"Determine external objects and the sequence in which they provide inputs to and receive outputs from each use case.",c:"Determine sequence of interactions among use cases.",d:"Determine how a use case is depicted through internal states and transitions between them.",answer:"a"},
+    {q:"Which of the following interactions could happen on an interaction diagram?",a:"An external user sends a message to a user interaction object.",b:"An external user sends a message to an entity object.",c:"An external user sends a message to an I/O object.",d:"An external user sends a message to a printer object.",answer:"a"},
+    {q:"Which of the following interactions is NOT likely to happen on an interaction diagram?",a:"A user interaction object sends a message to an entity object.",b:"An input object sends a message to a state-dependent control object.",c:"An input object sends a message to a printer object.",d:"A user interaction object sends a message to a proxy object.",answer:"c"},
+    {q:"What kind of object would be the first object to receive an input from an external object?",a:"A user interaction object.",b:"A proxy object.",c:"An entity object.",d:"A boundary object.",answer:"d"}
+  ]},
+  // ── Chapter 10 ──
+  { name:"Chapter 10: Finite State Machines", questions:[
+    {q:"What is a state in a state machine?",a:"A recognizable situation that exists over an interval of time.",b:"A condition that is True or False.",c:"An input from the external environment.",d:"An output from the system.",answer:"a"},
+    {q:"What is an event in a state machine?",a:"A discrete signal that causes a change of state.",b:"An input from the external environment.",c:"An input that is True or False.",d:"The result of a state transition.",answer:"a"},
+    {q:"What is an action in a state machine?",a:"An occurrence at a point in time.",b:"A cause of a state transition.",c:"An interval between two successive events.",d:"A computation that executes as a result of a state transition.",answer:"d"},
+    {q:"What is an entry action in a state machine?",a:"An action that is performed when the state is entered.",b:"An action that is performed when the state is left.",c:"An action that starts executing when the state is entered and completes when the state is left.",d:"An action that executes as a result of a state transition.",answer:"a"},
+    {q:"What is an exit action in a state machine?",a:"An action that is performed when the state is entered.",b:"An action that is performed when the state is left.",c:"An action that starts executing when the state is entered and completes when the state is left.",d:"An action that executes as a result of a state transition.",answer:"b"},
+    {q:"What is a condition used for in a state machine?",a:"A conditional action.",b:"A conditional state.",c:"A conditional state transition.",d:"A conditional event.",answer:"c"},
+    {q:"What is a state transition into a composite state equivalent to?",a:"A transition into only one of the substates.",b:"A transition into each of the substates.",c:"A transition into none of the substates.",d:"A transition into any one of the substates.",answer:"a"},
+    {q:"What is a state transition out of a composite state equivalent to?",a:"A transition out of only one of the substates.",b:"A transition out of each of the substates.",c:"A transition out of none of the substates.",d:"A transition out of any one of the substates.",answer:"b"},
+    {q:"How does a composite state relate to a substate?",a:"A composite state is decomposed into substates.",b:"Composite states are composed into substates.",c:"A composite state transitions to a substate.",d:"A substate transitions to a composite state.",answer:"a"},
+    {q:"If two actions are shown on a given state transition, which of the following is true?",a:"The two actions are dependent on each other.",b:"The two actions are independent of each other.",c:"One action provides an input to the other action.",d:"The second action executes when the first action completes execution.",answer:"b"}
+  ]},
+  // ── Chapter 11 ──
+  { name:"Chapter 11: State-Dependent Dynamic Interaction Modeling", questions:[
+    {q:"What does a state-dependent interaction involve?",a:"A control object.",b:"A state-dependent entity object.",c:"A state-dependent control object.",d:"A state-dependent user interaction object.",answer:"c"},
+    {q:"Which kind of object executes a state machine?",a:"Any software object.",b:"An entity object.",c:"A state-dependent control object.",d:"A statechart.",answer:"c"},
+    {q:"An input message to a state-dependent control object corresponds to:",a:"An event on the internal state machine.",b:"An action on the internal state machine.",c:"A condition on the internal state machine.",d:"A state on the internal state machine.",answer:"a"},
+    {q:"An output message from a state-dependent control object corresponds to:",a:"An event on the internal state machine.",b:"An action on the internal state machine.",c:"A condition on the internal state machine.",d:"A state on the internal state machine.",answer:"b"},
+    {q:"An interaction diagram should be developed for:",a:"Only the main sequence of the use case.",b:"The main sequence and every alternative sequence of the use case.",c:"The main sequence and a representative alternative sequence of the use case.",d:"The alternative sequences of the use case.",answer:"b"},
+    {q:"Which of the following could happen on an interaction diagram?",a:"A state-dependent control object sends a message to an entity object.",b:"A state-dependent control object sends a message to a coordinator object.",c:"A state-dependent control object sends a message to a printer object.",d:"All of the above.",answer:"d"},
+    {q:"If the same state machine is used in more than one use case, how is this modeled on interaction diagrams?",a:"Develop one state-dependent control object for each use case.",b:"Develop one state-dependent control object containing states from each use case.",c:"Develop a hierarchical state machine.",d:"Develop a coordinator object.",answer:"b"},
+    {q:"How would two state-dependent control objects communicate with each other?",a:"By sending messages to each other.",b:"By transitioning to the same state.",c:"Through an entity object.",d:"Through a proxy object.",answer:"a"},
+    {q:"An object can send alternative messages a or b to a state-dependent control object. How is this handled in the state machine?",a:"One state with a different transition out of it for each incoming message.",b:"One state for each of the alternative messages.",c:"A composite state to handle the alternative messages.",d:"A substate for each alternative message.",answer:"a"},
+    {q:"In a system where a client object executes a state machine and communicates with a service, which of the following is true?",a:"The client has a state-dependent control object but the service does not.",b:"The service has a state-dependent control object but the client does not.",c:"Both the client and the service have state-dependent control objects.",d:"Neither the client nor the service has a state-dependent control object.",answer:"a"}
+  ]},
+  // ── Chapter 12 ──
+  { name:"Chapter 12: Overview of Software Architecture", questions:[
+    {q:"What does the software architecture describe?",a:"The software inside a building.",b:"The structure of a client/server system.",c:"The overall structure of a software system.",d:"The software classes and their relationships.",answer:"c"},
+    {q:"Which of the following statements is NOT true for a component?",a:"A composite object composed of other objects.",b:"An operation.",c:"A simple object.",d:"Provides an interface.",answer:"b"},
+    {q:"What is a structural view of a software architecture?",a:"A view in terms of a module hierarchy.",b:"A view in terms of components and connectors.",c:"A view of the physical configuration in terms of nodes and interconnections.",d:"A view in terms of objects and messages.",answer:"b"},
+    {q:"What is a dynamic view of a software architecture?",a:"A view in terms of a module hierarchy.",b:"A view in terms of components and connectors.",c:"A view of the physical configuration in terms of nodes and interconnections.",d:"A view in terms of objects and messages.",answer:"d"},
+    {q:"What is a deployment view of a software architecture?",a:"A static view in terms of a module hierarchy.",b:"A static view in terms of components and connectors.",c:"A view of the physical configuration in terms of nodes and interconnections.",d:"A dynamic interaction view in terms of objects and messages.",answer:"c"},
+    {q:"What is a software architectural pattern?",a:"The structure of the major subsystems of a system.",b:"The components and connectors in a software architecture.",c:"A small group of collaborating objects.",d:"A recurring architecture used in a variety of systems.",answer:"a"},
+    {q:"What happens in a Layers of Abstraction pattern?",a:"Each layer uses services in the layer immediately below it.",b:"Each layer uses services in the layer immediately above it.",c:"Each layer uses services in the layers immediately above it and below it.",d:"Each layer is independent of the other layers.",answer:"a"},
+    {q:"What happens in a Call/Return pattern?",a:"A calling operation sends a message to an operation in the called object.",b:"A calling operation invokes an operation (a.k.a. method) in the called object.",c:"The calling object waits for a response from the called object.",d:"The calling object does not wait for a response from the called object.",answer:"b"},
+    {q:"A producer sends a message to a consumer. Which one of the following is asynchronous message communication?",a:"The producer waits for a response from the consumer.",b:"The producer does not wait for a response from the consumer.",c:"The producer goes to sleep.",d:"The producer waits for a timeout.",answer:"b"},
+    {q:"A producer sends a message to a consumer. Which one of the following is synchronous message communication with reply?",a:"The producer waits for a response from the consumer.",b:"The producer does not wait for a response from the consumer.",c:"The producer goes to sleep.",d:"The producer waits for a timeout.",answer:"a"}
+  ]},
+  // ── Chapter 13 ──
+  { name:"Chapter 13: Software Subsystem Architectural Design", questions:[
+    {q:"What is an integrated communication diagram?",a:"A communication diagram formed by combining objects.",b:"A synthesis of all the communication diagrams developed to support the use cases.",c:"A communication diagram depicting the objects that realize a use case.",d:"A communication diagram that integrates the entity objects from the static model.",answer:"b"},
+    {q:"Which of the following objects should be assigned to the same subsystem?",a:"Objects that are part of the same composite object.",b:"Client and server objects.",c:"User interface and entity objects.",d:"Objects that are associated with each other.",answer:"a"},
+    {q:"Objects that are in geographically different locations should be:",a:"In the same subsystem.",b:"In different subsystems.",c:"In a composite subsystem.",d:"In layered subsystems.",answer:"b"},
+    {q:"If scope of control is used in subsystem structuring, then:",a:"A user interface object is placed in the same subsystem as an entity object it updates.",b:"A state-dependent control object is placed in the same subsystem as the objects it controls.",c:"A state-dependent control object is placed in a different subsystem from the objects it controls.",d:"A user interface object is placed in a different subsystem from an entity object it updates.",answer:"b"},
+    {q:"How should an external object be designed to interface to the system?",a:"It should interface to one subsystem.",b:"It should interface to several subsystems.",c:"It should interface to every subsystem.",d:"It should interface to none of the subsystems.",answer:"a"},
+    {q:"A user interface subsystem is a type of:",a:"Control subsystem.",b:"Service subsystem.",c:"Client subsystem.",d:"I/O subsystem.",answer:"c"},
+    {q:"Which of the following objects are NOT likely to be in the same subsystem?",a:"User interface object and entity object.",b:"State-dependent control object and coordinator object.",c:"Business logic object and entity object.",d:"I/O object and state-dependent control object.",answer:"b"},
+    {q:"Which of the following subsystems is NOT likely to be a client subsystem?",a:"Control subsystem.",b:"User interaction subsystem.",c:"Service subsystem.",d:"I/O subsystem.",answer:"c"},
+    {q:"When is a coordinator subsystem required?",a:"If the subsystem needs to coordinate several internal objects.",b:"If the subsystem needs to coordinate multiple I/O devices.",c:"If the subsystem receives messages from multiple client subsystems.",d:"If the subsystem needs to coordinate the execution of other subsystems.",answer:"d"},
+    {q:"When is a control subsystem required?",a:"If the subsystem needs to control several internal objects.",b:"If the subsystem needs to control multiple I/O devices.",c:"If the subsystem needs to control multiple client subsystems.",d:"If the subsystem needs to control the execution of other subsystems.",answer:"a"}
+  ]},
+  // ── Chapter 14 ──
+  { name:"Chapter 14: Designing Object-Oriented Software Architectures", questions:[
+    {q:"What is an information hiding object?",a:"An active object that encapsulates data.",b:"A passive object that encapsulates data.",c:"A class that encapsulates data.",d:"A task that encapsulates data.",answer:"b"},
+    {q:"What is a class interface?",a:"Specifies the internals of the operations of a class.",b:"Specifies the externally visible operations of a class.",c:"Specifies the parameters of a class operation.",d:"Specifies the signature of a class operation.",answer:"b"},
+    {q:"Which of the following is NOT an object-oriented concept?",a:"Information hiding.",b:"Class.",c:"Subclass.",d:"Subroutine.",answer:"d"},
+    {q:"Which of the following is a class that realizes an interface?",a:"The class calls the interface.",b:"The class implements the interface.",c:"The class is called by the interface.",d:"The class is independent of the interface.",answer:"c"},
+    {q:"Which of the following is an entity class?",a:"An information hiding class.",b:"A subclass.",c:"A control class.",d:"A data abstraction class.",answer:"d"},
+    {q:"What does a state machine class encapsulate?",a:"A state transition table.",b:"A statechart.",c:"The current state of the machine.",d:"A state transition table and the current state of the machine.",answer:"d"},
+    {q:"Which of the following is unlikely to be a graphical user interface class?",a:"A menu.",b:"A window.",c:"A button.",d:"A pin.",answer:"d"},
+    {q:"Which of the following is unlikely to be encapsulated in a business logic class?",a:"A business rule.",b:"Calls to operations of an entity class.",c:"Deny cash withdrawal if balance of account is less than $10.",d:"A dialog box.",answer:"d"},
+    {q:"Which of the following is NOT allowed through inheritance?",a:"Subclass inherits attributes from superclass.",b:"Subclass inherits operations from superclass.",c:"Subclass redefines attributes inherited from superclass.",d:"Subclass redefines operations inherited from superclass.",answer:"c"},
+    {q:"Which of the following is true for an abstract class?",a:"It is used as a template for creating objects.",b:"It is used as a template for creating subclasses.",c:"It is used as a template for creating classes.",d:"It is used as a template for creating superclasses.",answer:"b"},
+    {q:"In object-oriented design, polymorphism means that:",a:"Different classes may have the same name.",b:"Different classes may have the same interface name.",c:"Different classes may have the same superclass name.",d:"Different classes may have the same operation name.",answer:"d"},
+    {q:"With polymorphism and dynamic binding, an object can:",a:"Invoke operations of different names on the same objects.",b:"Invoke operations of different names on different objects.",c:"Invoke an operation of the same name on the same object.",d:"Invoke an operation of the same name on different objects.",answer:"d"}
+  ]},
+  // ── Chapter 15 ──
+  { name:"Chapter 15: Designing Client/Server Software Architectures", questions:[
+    {q:"What is a server?",a:"A hardware/software system that serves customers.",b:"A subsystem that makes requests and waits for the responses.",c:"A subsystem that responds to requests from clients.",d:"A hardware/software system that provides one or more services for multiple clients.",answer:"d"},
+    {q:"The basic client/single service architectural pattern states that:",a:"Multiple clients request services, and multiple services fulfill client requests.",b:"Multiple clients request services, and a service fulfills client requests.",c:"A client requests services, and a service fulfills client requests.",d:"A client requests services, and multiple services fulfill client requests.",answer:"b"},
+    {q:"In a Multi-tier Client/Service architectural pattern, which of the following is true about an intermediate tier?",a:"An intermediate tier is a client tier.",b:"An intermediate tier is a service tier.",c:"An intermediate tier is both a control tier and a service tier.",d:"An intermediate tier is both a client tier and a service tier.",answer:"d"},
+    {q:"How is Multiple Client/Multiple Service architectural pattern different from a Multiple Client/Single Service architectural pattern?",a:"A service can receive requests from multiple clients.",b:"A client can send requests to multiple services.",c:"A client can send requests to other clients.",d:"A service can respond to requests from multiple clients.",answer:"b"},
+    {q:"How is a sequential service designed?",a:"One object that responds to requests from clients.",b:"Multiple objects that respond to requests from clients.",c:"One subsystem that responds to requests from clients.",d:"Multiple subsystems that respond to requests from clients.",answer:"a"},
+    {q:"How is a concurrent service designed?",a:"One object that responds to requests from clients.",b:"Multiple objects that respond to requests from clients.",c:"One subsystem that responds to requests from clients.",d:"Multiple subsystems that respond to requests from clients.",answer:"b"},
+    {q:"What is a database wrapper class?",a:"A class that encapsulates a data structure.",b:"A class that encapsulates a database.",c:"A class that encapsulates the details of how to access data in a database.",d:"A class that encapsulates a relational table.",answer:"c"},
+    {q:"When designing an entity class as a relational table, which of the following is NOT true?",a:"The relational table has multiple primary keys.",b:"The relational table has multiple foreign keys.",c:"The relational table has a primary key.",d:"The relational table has a concatenated primary key.",answer:"a"},
+    {q:"When mapping an aggregation hierarchy to a relational table, which of the following is NOT true?",a:"The aggregate and part tables have different primary keys.",b:"The aggregate and part tables have the same primary key.",c:"The primary key of the aggregate table is a foreign key of the part table.",d:"The primary key of the part table is a foreign key of the aggregate table.",answer:"d"},
+    {q:"When mapping a generalization/specialization relationship to a relational database, which of the following is NOT possible?",a:"The superclass and each subclass are designed as relational tables.",b:"Only subclasses are designed as relational tables.",c:"The aggregate and part classes are designed as relational tables.",d:"Only the superclass is designed as a relational table.",answer:"c"}
+  ]},
+  // ── Chapter 16 ──
+  { name:"Chapter 16: Designing Service-Oriented Architectures", questions:[
+    {q:"What is a service-oriented architecture (SOA)?",a:"A distributed software architecture consisting of multiple related services.",b:"A distributed software architecture consisting of multiple autonomous services.",c:"A distributed client/service architecture.",d:"A distributed software architecture.",answer:"b"},
+    {q:"Which of the following properties DOES NOT apply to a service?",a:"Reusable.",b:"Discoverable.",c:"Fixed.",d:"Autonomous.",answer:"c"},
+    {q:"In a SOA, which of the following is NOT true?",a:"A client communicates with a specific service provided on a fixed server configuration.",b:"A client discovers and links to a service.",c:"Multiple clients communicate with a service.",d:"Standard protocols are provided to allow clients to communicate with services.",answer:"a"},
+    {q:"What is an object broker?",a:"An object that breaks into a system.",b:"An object that sends requests to other objects.",c:"An object that handles requests sent by other objects.",d:"An object that mediates interactions between clients and services.",answer:"d"},
+    {q:"Why does a service register with a broker?",a:"So that service requesters can discover it.",b:"So that a service can interrogate the broker.",c:"So that the registry is up to date.",d:"So that the service can relocate.",answer:"a"},
+    {q:"When is it particularly useful to use the Broker Handle pattern in place of the Broker Forwarding pattern?",a:"If the client only communicates with the service once.",b:"If the client needs to have a dialog with the service.",c:"If the client knows the type of service required but not the specific service.",d:"If the client needs to provide the broker with a handle.",answer:"b"},
+    {q:"Yellow pages brokering is useful when a service requester:",a:"Needs to discover the location of the service.",b:"Knows the type of service required but not the specific service.",c:"Knows the specific service required but not the type of service.",d:"Needs to discover the broker.",answer:"b"},
+    {q:"What is a transaction?",a:"Consists of two or more operations.",b:"Consists of one operation.",c:"Consists of two or more operations that are indivisible.",d:"Consists of two or more operations that are divisible.",answer:"c"},
+    {q:"What is a compound transaction?",a:"The compound transaction is indivisible.",b:"The compound transaction is atomic.",c:"The compound transaction is decomposed into atomic transactions.",d:"The compound transaction is decomposed into subatomic transactions.",answer:"c"},
+    {q:"With a Negotiation pattern, which of the following is NOT true?",a:"The client agent can propose a service.",b:"The service agent can offer a service in response to a client agent proposal.",c:"The client agent can request a service.",d:"The service agent can offer a service in response to a client agent request.",answer:"d"}
+  ]},
+  // ── Chapter 17 ──
+  { name:"Chapter 17: Designing Component-Based Software Architectures", questions:[
+    {q:"In a distributed component-based software architecture, which of the following statements is the most complete description of component deployment?",a:"Component instances can be deployed to different nodes in a geographically distributed environment.",b:"Component instances can be deployed to different nodes in a geographically distributed environment before design.",c:"Component instances can be deployed to different nodes in a geographically distributed environment before implementation.",d:"Component instances can be deployed to different nodes in a geographically distributed environment after design and implementation.",answer:"d"},
+    {q:"What does a component interface consist of?",a:"The externally visible operations of a component.",b:"The operations provided by a component.",c:"The operations required by a component.",d:"The operations that a component supports.",answer:"a"},
+    {q:"What does a component's provided interface consist of?",a:"The operations that a component must fulfill.",b:"The operations inside a component.",c:"The operations that a component uses.",d:"The operations of a component.",answer:"a"},
+    {q:"What does a component's required interface consist of?",a:"The operations that a component must fulfill.",b:"The operations inside a component.",c:"The operations that a component uses.",d:"The visible operations of a component.",answer:"b"},
+    {q:"What does a connector join?",a:"The provided port of one component to the required port of another component.",b:"The provided port of one component to the provided port of another component.",c:"The required port of one component to the provided port of another component.",d:"The required port of one component to the required port of another component.",answer:"c"},
+    {q:"What does a delegation connector join?",a:"An outer provided port to an inner provided port.",b:"An outer provided port to an inner required port.",c:"An outer required port to an inner provided port.",d:"An outer provided port to an outer required port.",answer:"a"},
+    {q:"What is broadcast message communication?",a:"A message sent to several recipients.",b:"A message sent to a specific recipient.",c:"A message sent to all recipients.",d:"A message sent to recipients who are members of a group.",answer:"c"},
+    {q:"What are the communication characteristics of subscription/notification?",a:"A message sent to several recipients.",b:"A message sent to a specific recipient.",c:"A message sent to all recipients.",d:"A message sent to recipients who have joined a group.",answer:"d"},
+    {q:"During application deployment:",a:"The application is executed.",b:"Component instances are executed.",c:"Component instances are assigned to hardware nodes.",d:"Component instances are instantiated.",answer:"c"},
+    {q:"What is an advantage of localized autonomy in component-based design?",a:"If a component goes down, other components can continue to execute.",b:"Components execute concurrently.",c:"Components are distributed.",d:"Components communicate using messages.",answer:"a"}
+  ]},
+  // ── Chapter 18 ──
+  { name:"Chapter 18: Designing Concurrent and Real-Time Software Architectures", questions:[
+    {q:"What is the difference between an active object and a passive object?",a:"An active object controls a passive object.",b:"An active object does not have a thread of control; a passive object has a thread of control.",c:"An active object executes in a distributed system; a passive object executes in a centralized system.",d:"An active object has a thread of control; a passive object does not have a thread of control.",answer:"d"},
+    {q:"What is an event-driven input task?",a:"A task that executes every few seconds.",b:"A task that controls other tasks.",c:"A task that receives inputs from an external device when it generates interrupts.",d:"A task that checks whether there is new input from an external device.",answer:"c"},
+    {q:"What is a periodic task?",a:"A task that responds to each message it receives.",b:"A task that is activated by a timer event.",c:"A task that is activated by an external event.",d:"A task that is activated by an input event.",answer:"b"},
+    {q:"What is a demand-driven task?",a:"A task that responds to each message it receives.",b:"A task that is activated by an internal message or event from another task.",c:"A task that is activated by an external event.",d:"A task that is activated by an input event.",answer:"b"},
+    {q:"What is a control task?",a:"A task that controls other tasks.",b:"A task that executes a statechart.",c:"A task that executes on demand.",d:"A task that controls I/O devices.",answer:"b"},
+    {q:"What is a user interaction task?",a:"A task that interacts with I/O devices.",b:"A task that interacts with users.",c:"A task that interacts with a user sequentially.",d:"A task that interacts with a user concurrently.",answer:"c"},
+    {q:"Which of the following is true for a Centralized Control architectural pattern?",a:"Control is divided among various control components.",b:"It provides the overall control and sequencing of the system.",c:"It provides overall control by coordinating several control components.",d:"It provides overall control over various I/O objects.",answer:"b"},
+    {q:"Which of the following is true for a Distributed Control architectural pattern?",a:"Control is divided among various control components.",b:"It responds to multiple requests from client subsystems.",c:"It provides overall control by coordinating several control components.",d:"It provides distributed control over various I/O objects.",answer:"a"},
+    {q:"Which of the following is true for a Hierarchical Control architectural pattern?",a:"Control is divided among various control components.",b:"It provides overall control over several client subsystems.",c:"It provides overall control by coordinating several control components.",d:"It provides overall control over various I/O objects.",answer:"c"},
+    {q:"Which of the following is NOT a case of event synchronization?",a:"External event.",b:"Internal event.",c:"Timer event.",d:"User event.",answer:"d"}
+  ]},
+  // ── Chapter 19 ──
+  { name:"Chapter 19: Designing Software Product Line Architectures", questions:[
+    {q:"What is a software product line (SPL)?",a:"A family of systems with some common components and some variable components.",b:"An assembly line.",c:"A family of identical systems.",d:"The software products marketed by a company.",answer:"a"},
+    {q:"What is an optional use case?",a:"A use case with some optional steps.",b:"A use case that does not need to be developed.",c:"A use case that is required by some product line members but not others.",d:"A use case that can be chosen in place of a different use case in a SPL member.",answer:"c"},
+    {q:"What is a use case variation point?",a:"A variable use case.",b:"A location in the use case at which change can occur.",c:"An alternative use case.",d:"A location in the use case where an alternative path can start.",answer:"b"},
+    {q:"What is a SPL feature?",a:"A requirement or characteristic that is provided by one or more SPL members.",b:"A marketing need.",c:"A class provided by the SPL.",d:"A SPL use case.",answer:"a"},
+    {q:"What is a SPL feature group?",a:"A collection of features.",b:"A group of features with a particular constraint on their usage in a SPL member.",c:"A group of mutually exclusive features.",d:"A group of optional features with a particular constraint on their usage in a SPL member.",answer:"b"},
+    {q:"What is a kernel class in a SPL?",a:"An entity class in the SPL.",b:"A SPL class that stores essential data.",c:"A class that is required by all members of the SPL.",d:"An external class to the SPL.",answer:"c"},
+    {q:"What two categories of stereotypes are used in modeling SPL classes?",a:"Kernel and optional stereotypes.",b:"Optional and variant stereotypes.",c:"Common and variant stereotypes.",d:"Reuse and application role stereotypes.",answer:"d"},
+    {q:"How are feature conditions used in a SPL state machine?",a:"A guard condition.",b:"A condition that is True or False.",c:"To identify if a feature is selected or not in the state machine.",d:"To allow state machine inheritance.",answer:"c"},
+    {q:"What is a kernel system in a SPL?",a:"A member of the SPL only composed of kernel classes.",b:"A member of the SPL composed of kernel classes and possibly some default classes.",c:"A member of the SPL composed of kernel classes and possibly some optional classes.",d:"A member of the SPL composed of kernel classes and possibly some entity classes.",answer:"b"},
+    {q:"What does the SPL software architecture describe?",a:"The software inside a family of buildings.",b:"The structure of a client/server product family.",c:"The overall structure of the software product line.",d:"The software product line classes and their relationships.",answer:"c"}
+  ]},
+  // ── Chapter 20 ──
+  { name:"Chapter 20: Software Quality Attributes", questions:[
+    {q:"What do software quality attributes address?",a:"Software functional requirements.",b:"Software nonfunctional requirements.",c:"Software performance requirements.",d:"Software availability requirements.",answer:"b"},
+    {q:"What is maintainability?",a:"The extent to which software is capable of being changed before deployment.",b:"The extent to which software is capable of being changed after deployment.",c:"The extent to which software is capable of being changed during development.",d:"The extent to which software is capable of being changed after development.",answer:"b"},
+    {q:"What is modifiability?",a:"The extent to which software is capable of being modified after deployment.",b:"The extent to which software is capable of being modified after initial development.",c:"The extent to which software is capable of being modified during and after initial development.",d:"The extent to which software is capable of being changed before deployment.",answer:"c"},
+    {q:"What is testability?",a:"The extent to which software is capable of being developed.",b:"The extent to which software is capable of being tested before deployment.",c:"The extent to which software is capable of being tested after deployment.",d:"The extent which the software is understood.",answer:"b"},
+    {q:"Traceability is the extent to which a product:",a:"Can be traced back to products of previous phases.",b:"Traced back to the requirements.",c:"Traced forward to implementation.",d:"Deployed to a hardware configuration.",answer:"a"},
+    {q:"What is scalability?",a:"The extent to which an application can grow.",b:"The extent to which the system is capable of growing after its initial deployment.",c:"The extent to which the system is capable of growing during development.",d:"The extent to which the system is capable of being scaled.",answer:"b"},
+    {q:"What is reusability?",a:"The extent to which software implementation is reusable.",b:"The extent to which software is capable of being reused.",c:"The extent to which SPL technology can be introduced.",d:"The extent to which the software is common among a program family.",answer:"b"},
+    {q:"Which of the following is not performance-related?",a:"System response time.",b:"System throughput.",c:"System availability.",d:"System capacity.",answer:"c"},
+    {q:"Which of the following is not addressed by a secure system?",a:"System penetration.",b:"Denial of service.",c:"System scalability.",d:"System authorization.",answer:"c"},
+    {q:"Which of the following system problems does availability address?",a:"Denial of service.",b:"Single point of failure.",c:"System throughput.",d:"System penetration.",answer:"b"}
+  ]}
+];
+
+function buildCards(indexes) {
+  const out = [];
+  indexes.forEach(ci => {
+    const ch = CHAPTERS[ci];
+    if (ch.questions) {
+      ch.questions.forEach((q,qi) => out.push({ci, name:ch.name, qNum:qi+1, type:'full', data:q}));
+    } else {
+      ch.answers.forEach((ans,qi) => out.push({ci, name:ch.name, qNum:qi+1, type:'simple', answer:ans}));
+    }
+  });
+  return out;
+}
+
+let allCards = buildCards([...Array(20).keys()]);
+let cards    = [...allCards];
+let current  = 0;
+const answered = {}; // key -> chosen letter | 'revealed'
+
+function cardKey(c) { return `${c.ci}_${c.qNum}`; }
+
+function loadChapter() {
+  const val = document.getElementById('chapterSelect').value;
+  const idx = val === 'all' ? [...Array(20).keys()] : [parseInt(val)];
+  allCards = buildCards(idx); cards = [...allCards]; current = 0; renderCard();
+}
+
+function renderCard() {
+  if (!cards.length) return;
+  const c   = cards[current];
+  const key = cardKey(c);
+  const ans = answered[key];
+
+  document.getElementById('progressBar').style.width = ((current+1)/cards.length*100)+'%';
+  document.getElementById('progressText').textContent = `Câu ${current+1} / ${cards.length}`;
+  document.getElementById('btnPrev').disabled = current === 0;
+  document.getElementById('btnNext').disabled = current === cards.length-1;
+  updateStats();
+
+  const card = document.getElementById('card');
+
+  if (c.type === 'full') {
+    const d = c.data;
+    const opts = ['a','b','c','d'].map(k => {
+      let cls = 'option' + (ans ? ' disabled' : '');
+      if (ans) {
+        if (k === d.answer)   cls += ' correct';
+        else if (k === ans)   cls += ' wrong';
+      }
+      const click = ans ? '' : `onclick="checkAnswer('${k}')"`;
+      return `<div class="${cls}" ${click}><span class="option-key">${k.toUpperCase()}</span><span>${d[k]}</span></div>`;
+    }).join('');
+
+    let fb = '';
+    if (ans) {
+      if (ans === d.answer) fb = `<div class="feedback ok show">✓ Chính xác!</div>`;
+      else                  fb = `<div class="feedback err show">✗ Sai! Đáp án đúng là <strong>(${d.answer.toUpperCase()})</strong></div>`;
+    }
+
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-chapter">${c.name}</div>
+      <div class="card-qnum">Câu ${c.qNum}</div>
+      <div class="card-question">${d.q}</div>
+      <div class="options">${opts}</div>
+      ${fb}`;
+  } else {
+    card.className = 'card simple';
+    card.innerHTML = `
+      <div class="card-chapter">${c.name}</div>
+      <div class="simple-qnum">Câu ${c.qNum}</div>
+      <div class="simple-note">Chưa có nội dung câu hỏi</div>
+      ${!ans ? `<button class="btn-reveal" onclick="revealSimple()">Xem đáp án</button>` : ''}
+      <div class="simple-ans ${ans ? 'show' : ''}">
+        <div class="ans-circle">${c.answer.toUpperCase()}</div>
+      </div>`;
+  }
+}
+
+function checkAnswer(chosen) {
+  const c = cards[current];
+  if (!c || c.type !== 'full' || answered[cardKey(c)]) return;
+  answered[cardKey(c)] = chosen;
+  renderCard();
+}
+
+function revealSimple() {
+  answered[cardKey(cards[current])] = 'revealed';
+  renderCard();
+}
+
+function changeCard(dir) {
+  const n = current + dir;
+  if (n < 0 || n >= cards.length) return;
+  current = n; renderCard();
+}
+
+function shuffleCards() {
+  for (let i = cards.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [cards[i],cards[j]] = [cards[j],cards[i]];
+  }
+  current = 0; renderCard();
+}
+
+function showOnlyWrong() {
+  const wrong = allCards.filter(c => {
+    const a = answered[cardKey(c)];
+    return c.type === 'full' && a && a !== c.data.answer;
+  });
+  if (!wrong.length) { alert('Không có câu nào sai!'); return; }
+  cards = wrong; current = 0; renderCard();
+}
+
+function resetAll() {
+  Object.keys(answered).forEach(k => delete answered[k]);
+  cards = [...allCards]; current = 0; renderCard();
+}
+
+function updateStats() {
+  const full    = allCards.filter(c => c.type === 'full');
+  const done    = full.filter(c => answered[cardKey(c)]);
+  const correct = done.filter(c => answered[cardKey(c)] === c.data.answer);
+  document.getElementById('sCorrect').textContent = correct.length;
+  document.getElementById('sWrong').textContent   = done.length - correct.length;
+  document.getElementById('sRemain').textContent  = full.length - done.length;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight')         changeCard(1);
+  if (e.key === 'ArrowLeft')          changeCard(-1);
+  if (e.key === 'r' || e.key === 'R') shuffleCards();
+  if (['a','b','c','d'].includes(e.key)) checkAnswer(e.key);
+});
+
+renderCard();
+</script>
+</body>
+</html>
