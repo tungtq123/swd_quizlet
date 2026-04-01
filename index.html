@@ -101,7 +101,7 @@
   <label>Chọn Chapter</label>
   <div class="filter-row">
     <select id="chapterSelect">
-      <option value="all">Tất cả (20 chapters)</option>
+      <option value="all">Tất cả (21 chapters)</option>
       <option value="0">Chapter 1: Introduction</option>
       <option value="1">Chapter 2: Overview of the UML Notation</option>
       <option value="2">Chapter 3: Software Life Cycle Models and Processes</option>
@@ -122,6 +122,7 @@
       <option value="17">Chapter 18: Designing Concurrent and Real-Time Software Architectures</option>
       <option value="18">Chapter 19: Designing Software Product Line Architectures</option>
       <option value="19">Chapter 20: Software Quality Attributes</option>
+      <option value="20">Extra</option>
     </select>
     <button class="btn-load" onclick="loadChapter()">Tải câu hỏi</button>
   </div>
@@ -409,6 +410,151 @@ const CHAPTERS = [
     {q:"Which of the following is not performance-related?",a:"System response time.",b:"System throughput.",c:"System availability.",d:"System capacity.",answer:"c"},
     {q:"Which of the following is not addressed by a secure system?",a:"System penetration.",b:"Denial of service.",c:"System scalability.",d:"System authorization.",answer:"c"},
     {q:"Which of the following system problems does availability address?",a:"Denial of service.",b:"Single point of failure.",c:"System throughput.",d:"System penetration.",answer:"b"}
+  ]},
+  // ── Extra ──
+  { name:"Extra", questions:[
+    {q:"Which is dynamic diagram?", a:"Object diagram", b:"Package diagram", c:"Class diagram", d:"Use-case diagram", answer:"d"},
+    {q:"Which is the input of the software design phase?", a:"SRS", b:"UDD", c:"DDD", d:"SDD", answer:"a"},
+    {q:"Select the other name of implicit asynchronous communication software Architecture", a:"Consumer pattern", b:"Publisher pattern", c:"Subscriber pattern", d:"Observer pattern", answer:"d"},
+    {q:"What are some disadvantages of Data-Centric Architecture? 1. The system becomes heavily reliant on the central data. 2. The existing data schema is difficult to change. 3. Considerable overhead for data transfer between data accessors. 4. Data integrity can be compromised by having it widely accessible.", a:"1 and 2", b:"2 and 3", c:"4 and 1", d:"3 and 4", answer:"b"},
+    {q:"Good software architectural designs are based on the recursive application of_______", a:"refinement of specification", b:"refinement of generalization", c:"refinement of realization", d:"refinement of abstractions", answer:"d"},
+    {q:"Which is NOT a data type of variable in process control system?", a:"Input variable", b:"Manipulated variable", c:"Output variable", d:"Controlled variable", answer:"c"},
+    {q:"Which of the followings is a typical design domain of the blackboard architecture?", a:"Business information system", b:"Compilers", c:"Virtual machine", d:"AI system", answer:"d"},
+    {q:"Select the partition of nonbuffered event-based implicit invocation architecture", a:"event sources/message queue/message topic", b:"event sources/event listeners", c:"event sources/event listeners/message queue", d:"event sources/event listeners/message topic", answer:"b"},
+    {q:"Which is NOT style of hierarchical architecture?", a:"main-subroutine", b:"master-slave", c:"event-based", d:"layered", answer:"c"},
+    {q:"Select the correct statement about UML Sequence Diagram", a:"In UML Sequence Diagram there is no way to specify loops", b:"In UML Sequence Diagram both branches and loops can be specified", c:"In UML Sequence Diagram there is no way to specify branches", d:"In UML Sequence Diagram branches can be specified but not loops", answer:"b"},
+    {q:"Consider statements about PAC: 1. The Abstraction and Presentation components in a PAC agent do not talk to each other directly. 2. The PAC architecture is a hierarchically structured software architecture.", a:"1 is true, 2 is false", b:"1 and 2 are true", c:"1 and 2 are false", d:"1 is false, 2 is true", answer:"b"},
+    {q:"Asynchronous message invocation can be expressed in _________ diagram", a:"class", b:"object", c:"state", d:"sequence", answer:"d"},
+    {q:"Who can be the stakeholders of development view?", a:"End-user, Programmers", b:"System Analyst, System designer", c:"System designer, Programmers", d:"Software project manager, Programmers", answer:"d"},
+    {q:"Which of the following is true about the top down design strategies?", a:"Writing source code at the highest abstraction level", b:"Understanding the lowest level components and how these work together to accomplish the system's goals", c:"Starting at the highest level of system abstraction and recursively filling in understanding of the sub parts", d:"Starting with most specific and basic components. It proceeds with composing higher level of components by using basic or lower level components.", answer:"c"},
+    {q:"According to connector active time, we can classify connector into", a:"programmed connectors/event-driven connectors", b:"networked connectors/local connectors", c:"local connectors/event-driven connectors", d:"networked connectors/event-driven connectors", answer:"a"},
+    {q:"Which is not a partition of a P2P messaging architecture?", a:"message topic", b:"message queues", c:"senders", d:"receivers", answer:"a"},
+    {q:"Select the correct order from upper layer to lower layer of SOAP protocol, an example of layered architecture", a:"SOAP XML HTML TCP/IP", b:"TCP/IP HTML XML SOAP", c:"SOAP HTML XML TCP/IP", d:"SOAP TCP/IP XML HTML", answer:"a"},
+    {q:"Which of the following quality attributes can the pipe and filter architecture satisfy?", a:"Security", b:"Availability", c:"Performance", d:"Reusability", answer:"d"},
+    {q:"During conceptual design, what you will talk about?", a:"Technical diagrams, requirements, mockups", b:"Technical diagrams, requirements, tradeoffs", c:"Mockups, requirements, tradeoffs", d:"Technical diagrams, tradeoffs, mockups", answer:"b"},
+    {q:"Which attribute can be achieved via replication and careful design to cope with failures of hardware, software, or the network?", a:"Availability", b:"Scalability", c:"Performance", d:"Reliability", answer:"d"},
+    {q:"_______ includes matters of completeness, correctness, compatibility, as well as a friendly user interface, complete documentation, and technical support", a:"Scalability", b:"Portability", c:"Availability", d:"Usability", answer:"d"},
+    {q:"Identify the attribute refinements of a system's performance.", a:"simplicity and boot time", b:"latency and simplicity", c:"latency and boot time", d:"latency and throughput", answer:"d"},
+    {q:"The system composition configuration as layered, flattened, star typed, centralized, or distributed are described as the topology of the ________ structure", a:"static", b:"behavioral", c:"dynamic", d:"system structure", answer:"a"},
+    {q:"You are planning a professor class as part of your software design. Which of these will you consider a collaborator?", a:"Student and Course", b:"Teach Course and Student", c:"Track Employment Status and Student", d:"Course and Track Employment Status", answer:"a"},
+    {q:"How does an n-Tier architecture differ from a layered architecture?", a:"n-Tier architectures are only found on the Internet.", b:"Layered architectures are more loosely coupled.", c:"The interaction between tiers in an n-Tier architecture is strictly message based.", d:"A layered architecture is limited to three layers, whereas an n-tier can go to as many as are needed.", answer:"c"},
+    {q:"A component in Component diagram represents________", a:"class", b:"source code", c:"deployed reusable binary", d:"executable object", answer:"c"},
+    {q:"Which is the most desirable?", a:"low cohesion, loose coupling", b:"high cohesion, tight coupling", c:"high cohesion, loose coupling", d:"low cohesion, tight coupling", answer:"c"},
+    {q:"Identify two outcomes of the design process", a:"code implementation, design plan", b:"technical design, conceptual design", c:"technical design, code implementation", d:"design plan, conceptual design", answer:"b"},
+    {q:"Which of the following is NOT a limitation of pipe & filter?", a:"Overhead of data transformation among filters", b:"It is not suitable for dynamic interactions.", c:"None of the others", d:"It supports only sequential execution.", answer:"d"},
+    {q:"In an Architecture Style, what are key components?", a:"Classes, Relationships, Interfaces, Attributes", b:"Entities, Relationships, Attributes", c:"Objects, Messages, Lifelines", d:"Elements, Connectors, Constraints, Attributes", answer:"d"},
+    {q:"Concurrency can be described in______", a:"object diagram", b:"activity diagram", c:"class diagram", d:"package diagram", answer:"b"},
+    {q:"Which of the followings is NOT the benefit of repository architecture?", a:"Independent agents", b:"Loose coupling", c:"Concurrency", d:"Reusable agent", answer:"c"},
+    {q:"Which is NOT the benefit of nonbuffered event-based implicit invocation architecture?", a:"Independency and flexible connectivity", b:"Framework availability", c:"Reusability of components", d:"Message in queue can exist in longtime", answer:"d"},
+    {q:"The disadvantages of VM are", a:"Simplicity of software development", b:"Additional overhead due to the new layer", c:"Simulation for disaster working model", d:"Portability and machine platform independency", answer:"b"},
+    {q:"You have used dependency analysis tools on your code base. You find numerous cycles and tangles in the dependencies. The recommended approach to be followed is:", a:"Use profiling tools to find hotspots and remove the bottlenecks", b:"Adopt Domain Driven Design (DDD)", c:"Adopt Test Driven Development (TDD) approach", d:"Perform architecture refactoring", answer:"d"},
+    {q:"You are a programmer creating software for a bank machine system. Which section of a CRC card for the bank machine component will the 'User' go into?", a:"Object", b:"Class", c:"Collaborator", d:"Responsibility", answer:"b"},
+    {q:"Which is NOT the partition of nonbuffered event-based implicit invocation architecture?", a:"message event source", b:"message consumers", c:"message producers", d:"message service providers", answer:"d"},
+    {q:"What standard is used for all aspects of web service development in this module, from describing interfaces to publishing and discovering services?", a:"UDDI", b:"WSDL", c:"XML", d:"SOAP", answer:"c"},
+    {q:"Which is NOT a software architecture design guideline?", a:"Think about concrete design before thinking about abstract design.", b:"Think of non-functional requirements early in design process.", c:"Think of What to Do before How to Do It.", d:"Think of reusability and extensibility!", answer:"a"},
+    {q:"Which is not a component in interaction-oriented software architecture?", a:"Control module", b:"View presentation module", c:"Data module", d:"Data repository", answer:"d"},
+    {q:"Sam realized that her DeliveryDriver class had some behaviour and attributes that could be shared by other classes, like BusDriver and TaxiDriver, so she made a class called Driver that these classes inherited behaviour from. Which object-oriented design principle did she use?", a:"abstraction", b:"encapsulation", c:"decomposition", d:"generalization", answer:"d"},
+    {q:"Which of these UML diagrams might be useful for the logical view of a system?", a:"Class diagram and Sequence diagram", b:"Sequence diagram and Deployment diagram", c:"State diagram and Class diagram", d:"Deployment diagram and State diagram", answer:"a"},
+    {q:"There is a common technique used in event architectures to indicate whether or not a particular resource is being accessed by another process at that moment. What is it called?", a:"semaphore", b:"access switch", c:"toggle", d:"occupied", answer:"a"},
+    {q:"What is NOT an essential part of an HTTP request?", a:"A blank space", b:"A message body", c:"Headers", d:"Request-line", answer:"a"},
+    {q:"Which of the following attributes can be improved by installing firewalls, establishing authentication and authorization processes, and using encryption?", a:"availability", b:"usability", c:"performance", d:"security", answer:"d"},
+    {q:"Which of the following quality attribute pairs is a tradeoff?", a:"Scalability and Performance", b:"Reliability and Availability", c:"Availability and Interoperability", d:"Reusability and Interoperability", answer:"a"},
+    {q:"What is the name for a physical result of the development process, such as an executable file?", a:"node", b:"leaf", c:"package", d:"artifact", answer:"d"},
+    {q:"What might NOT be contained in an architecture style?", a:"Rules that define how to structure the system", b:"How to design user interface", c:"Constraints that define how to structure the system", d:"Patterns that define how to structure the system", answer:"b"},
+    {q:"Which connector type allows one of its incident elements to send a request (method call or message) to another and wait for a response?", a:"Unblocking", b:"Blocking", c:"Two-initiator", d:"One-initiator", answer:"b"},
+    {q:"Which of these is not a desirable characteristic of a web service?", a:"composable", b:"platform-independent", c:"modular", d:"simple", answer:"b"},
+    {q:"Which of these quality attributes is most important from the developer's perspective?", a:"usability", b:"availability", c:"flexibility", d:"security", answer:"c"},
+    {q:"What are the main software elements at software development time?", a:"Source code modules or files", b:"Binary versions of the project modules and files", c:"Processes and threads", d:"All of the others", answer:"a"},
+    {q:"Consider statements about MVC: 1. It is expensive to change data model in case of multiple pairs of controllers and views based on the same data model. 2. The division between the View and the Controller is not clear in some cases.", a:"1 and 2 are false", b:"1 and 2 are true", c:"1 is true, 2 is false", d:"1 is false, 2 is true", answer:"b"},
+    {q:"What are some advantages of object-oriented programming in a language like Java?", a:"computing efficiency, abstract data types and data management", b:"mimic the real-world structure of the problem, computing efficiency and data management", c:"mimic the real-world structure of the problem, abstract data types and data management", d:"mimic the real-world structure of the problem, abstract data types and computing efficiency", answer:"c"},
+    {q:"'Maintenance Downtime' is an attribute refinement of what quality attribute?", a:"Conceptual Integrity", b:"Performance", c:"Maintainability", d:"Availability", answer:"d"},
+    {q:"Which attribute quality is NOT from a user's perspective?", a:"Availability", b:"Interoperability", c:"Flexibility", d:"Performance", answer:"c"},
+    {q:"The '+1' in Kruchten's 4+1 View Model refers to a scenario. What is a scenario?", a:"an unexpected use case of the software", b:"one of the tools that is used to implement the software", c:"a representation of a normal use case", d:"a representation of the system-wide state", answer:"c"},
+    {q:"There are three different relationships that objects can have. Which of these best describes the relationship between a Chair and its Legs?", a:"association", b:"generalization", c:"composition", d:"aggregation", answer:"c"},
+    {q:"The process of establishing a connection between the client stub and server stub is called..", a:"interfacing", b:"marshaling", c:"handshaking", d:"binding", answer:"b"},
+    {q:"Select the object pairing that has an association relationship:", a:"Book - Page", b:"Tree - Root", c:"Hiker - Trail", d:"Car - Door", answer:"c"},
+    {q:"Which of these terms are used to describe coupling?", a:"degree, ease, exposed", b:"frequency, degree, ease", c:"ease, degree, flexibility", d:"flexibility, frequency, exposed", answer:"c"},
+    {q:"Marlon is creating a web page. It's a simple page which has a list of his current projects, a short bio about himself, and some GIF images. What type of web page is this?", a:"static web page", b:"dynamic web page", c:"web app", d:"web service", answer:"a"},
+    {q:"Which of the following attributes relates to the output accuracy and the ability to recover from failure?", a:"maintainability", b:"performance", c:"availability", d:"reliability", answer:"d"},
+    {q:"Read the following statements. Which of them are true? 1. Project managers are stakeholders in the architecture. 2. End users are stakeholders in the architecture.", a:"Only the second statement is true", b:"Only the first statement is true", c:"Neither statement is true", d:"Both statements are true", answer:"d"},
+    {q:"Which of these is a drawback of n-Tier architecture?", a:"Every tier demands extra resources to manage the client/server relationships", b:"n-Tier architecture is not scalable", c:"Only asynchronous messaging is possible, leading to challenging development decisions", d:"More hardware nodes are necessary", answer:"b"},
+    {q:"Which diagram is used to describe procedural detail?", a:"ER diagram", b:"class diagram", c:"box diagram", d:"decision table", answer:"c"},
+    {q:"Which of the following files are binary software component modules?", a:"Resource files", b:"Descriptor files", c:"Files in form of DLLs, JavaBeans, and Enterprise JavaBeans", d:"Executable files", answer:"c"},
+    {q:"Which of these is an advantage of main program and subroutine architectural style? 1. Efficient for computation focused problems 2. Easily mapped to all kinds of real-world problem spaces 3. Abstract data types are easy to define and extend 4. Promotes function modularity and reuse", a:"2 and 3", b:"3 and 4", c:"1 and 2", d:"1 and 4", answer:"b"},
+    {q:"An object which is responsible for showing data to the user could be considered which category of object?", a:"Boundary", b:"Entity", c:"Control", d:"Representation", answer:"a"},
+    {q:"Which of these is NOT shown on an activity diagram?", a:"activities", b:"interfaces", c:"concurrency", d:"decisions", answer:"b"},
+    {q:"At software development time, which of the following attributes may connectors exhibit?", a:"Universally invocable", b:"Direction", c:"Distance and connection media", d:"Multiplicity", answer:"d"},
+    {q:"Select the one accurate statement about layered architecture:", a:"Enforcing communication only between adjacent layers and within a layer is key to good, layered architecture", b:"Upper layers act as service providers to lower layers", c:"Layered architecture is often based on layers of abstraction", d:"Pass-through should be avoided at all costs.", answer:"a"},
+    {q:"Which of the following is one of the benefits of asynchronous architecture?", a:"Multiple independent agents", b:"Flexible GUI interfaces", c:"Multiple views", d:"Loose coupling of modules", answer:"d"},
+    {q:"Another web page allows interacting with a spreadsheet in a browser. You can enter in values, sum them up, perform operations on them, format them, etc. What type of web page is this?", a:"dynamic web page", b:"web service", c:"web app", d:"static web page", answer:"a"},
+    {q:"What are the advantages of Common Object Request Broker Architecture (CORBA)? 1. Method calls can be treated locally or remotely. 2. It allows for object-oriented paradigms in distributed computing.", a:"Only 1", b:"Only 2", c:"Neither 1 nor 2", d:"Either 1 or 2", answer:"b"},
+    {q:"Which of the following statements concerning Software architecture design guidelines is FALSE?", a:"Make all implementation decisions depend on the concrete interfaces instead of abstract ones because those are more stable", b:"Design always starts with abstraction", c:"Balance the quality attributes, and consider heterogeneous architecture styles when necessary", d:"It is not possible to find a design that meets all quality attributes", answer:"d"},
+    {q:"Which of these formats can NOT be used to express and structure content to be sent over the internet?", a:"XML", b:"CSS", c:"HTML", d:"JSON", answer:"b"},
+    {q:"For showing scenarios, which one of the following OOAD artifacts is the MOST useful?", a:"Use Cases", b:"State Diagrams", c:"Activity Diagrams", d:"Class Diagrams", answer:"a"},
+    {q:"Which architecture supports fault tolerance and system reliability?", a:"Layered architecture", b:"Main/subroutine", c:"Virtual machine", d:"Master/slave", answer:"d"},
+    {q:"What does the component of 'component diagram' refer to?", a:"a general name for a part of the software system", b:"the basic parts of the software which it could not run without a library", c:"an external part of the software system, like a library that must be imported", d:"an independent, encapsulated unit in the system", answer:"d"},
+    {q:"Which of these is often used to add dynamic content to a web page?", a:"HTML", b:"JavaScript", c:"HTML DOM", d:"CSS", answer:"b"},
+    {q:"Systems that optimize ease of use and those that are designed to be Reusable and Interoperable with other software or hardware components often incur a ............ penalty", a:"Performance", b:"None of others", c:"Security", d:"Reliability", answer:"a"},
+    {q:"On which of the following attributes does Portability have a positive effect?", a:"Reusability", b:"All of the others", c:"Interoperability", d:"Verifiability", answer:"b"},
+    {q:"Sam identified the important attributes and behaviours of a delivery driver and put them all into a DeliveryDriver class. She exposed some of these to other classes. Which of these concepts best describes what she did?", a:"generalization", b:"abstraction", c:"encapsulation", d:"decomposition", answer:"c"},
+    {q:"What is the correct term for a machine that hosts a server?", a:"server-host", b:"server-machine", c:"Called by type: e.g. print server or media server", d:"server-tier", answer:"b"},
+    {q:"Which architecture is suitable for producer/consumer model?", a:"Main/subroutine", b:"Process Control", c:"Pipe and filter", d:"Batch sequential", answer:"c"},
+    {q:"On which attribute does increasing of Reliability have a negative effect?", a:"Scalability", b:"Performance", c:"Usability", d:"Availability", answer:"d"},
+    {q:"Which of these is NOT an advantage of event-based architecture?", a:"The event source cannot determine", b:"Reliability may be an issue", c:"Difficult to maintain system", d:"Difficult to test and debug the system", answer:"a"},
+    {q:"Beverly is asked to develop a system to measure the height of liquid in a tank, and when the tank is almost full, a pump turns on to empty the tank. Which type of architecture will she use?", a:"Process control", b:"Message-based", c:"Master/slave", d:"Pipe and filter", answer:"a"},
+    {q:"What is the term for the action that converts the parameters into a standardized message on the client side?", a:"invocation", b:"blocking", c:"binding", d:"marshaling", answer:"d"},
+    {q:"Asynchronous message invocation can be expressed in the following diagram", a:"sequence", b:"state", c:"object", d:"class", answer:"a"},
+    {q:"General quality attributes like performance and security have more specific components like throughput and latency for performance. What are these called?", a:"attribute refinement", b:"architecture specifications", c:"architecture significant requirements", d:"sensitivity points", answer:"a"},
+    {q:"Which quality attribute includes communication protocols, data formats, and with whom the system can exchange information?", a:"Modifiability", b:"Flexibility", c:"Interoperability", d:"Security", answer:"c"},
+    {q:"A connector with .......... attribute set to true allows any external software system, no matter what hardware/software platforms they run on and in which programming languages or software frameworks they are developed", a:"Universally invocable", b:"Multiplicity", c:"Self-descriptive", d:"Distance and connection media", answer:"a"},
+    {q:"Which of the following statements is (are) an advantage of Pipe and filter? 1. This architecture can be used for interactive applications. 2. Filters are loosely coupled.", a:"Both statements are true", b:"Only the first statement is true", c:"Only the second statement is true", d:"Neither statement is true", answer:"a"},
+    {q:"In which method do evaluators not need to be familiar with the architecture or the problem space?", a:"ARID", b:"SAAM", c:"ALL", d:"ATAM", answer:"d"},
+    {q:"You need to show how your software elements are mapped to hardware nodes and execution environments. Which view do you need?", a:"physical view", b:"development view", c:"process view", d:"scenario", answer:"a"},
+    {q:"The feature in object-oriented programming that allows the same operation to be carried out differently, depending on the calling object, is:", a:"Inheritance", b:"Polymorphism", c:"Encapsulation", d:"Abstraction", answer:"b"},
+    {q:"Which of the following are considered as Business attributes?", a:"Cost: expense of building, maintaining, and operating the system", b:"Lifetime: period of time the product is alive before retirement", c:"All of the above", d:"Time to market: time from requirement analysis to date product is released", answer:"c"},
+    {q:"Which definition best describes an object?", a:"Instance of itself", b:"Child of a class", c:"Instance of a class", d:"Overview of a class", answer:"c"},
+    {q:"What is NOT a good software design?", a:"Leads to software products have higher quality attributes", b:"Reduces bugs in software production", c:"Coordinates development teams to work together orderly", d:"Makes the system traceable for implementation and testing", answer:"b"},
+    {q:"What are NOT the tasks of Software architect?", a:"Map the software requirements specification to the software architecture", b:"Consider and evaluate alternative architecture styles for the problem at hand", c:"Guarantee that the software architecture satisfies functional and non-functional requirements", d:"Establish good communication between stakeholders", answer:"d"},
+    {q:"The static and runtime structures are based on the same element types.", a:"True", b:"False", answer:"b"},
+    {q:"Fill in the blank: Objects send and receive ......... to invoke methods", a:"output", b:"delay", c:"error", d:"messages", answer:"d"},
+    {q:"Which of the following refers to the level of independence of the system on software and hardware platforms?", a:"Portability", b:"Extensibility", c:"Interoperability", d:"Maintainability", answer:"a"},
+    {q:"Which is correct about class?", a:"The behavior is expressed by the functions of the object", b:"An object is an instance of a class", c:"A class is an abstract description of a set of objects having similar properties, common behavior, common relationship with other objects", d:"Object is the concept describing an entity in the real world", answer:"c"},
+    {q:"Concurrency is described in", a:"Activity diagram", b:"Sequence diagram", c:"Communication diagram", d:"Package diagram", answer:"a"},
+    {q:"There are two aspects of software requirements: functional and non-functional. A functional requirement specifies the qualities, constraints, and system behaviors.", a:"True", b:"False", answer:"b"},
+    {q:"Which of the followings are not the key components of an architecture style?", a:"Constraints that define how elements can be integrated to form the system", b:"None of the others", c:"Connectors that enable communication, coordination, and cooperation among elements", d:"Elements that perform functions required by a system", answer:"b"},
+    {q:"Composition relationship is represented by hollow diamond arrow", a:"True", b:"False", answer:"b"},
+    {q:"In an interaction diagram, boxes on top of the diagram can represent classes, objects, and actors. Which of the following is true?", a:"'Customer:Joe' represents an object named 'Joe' whose class is 'Customer'", b:"when there is a ':' preceding a name, it represents a class", c:"'Customer:' represents an object named 'Customer'", d:"':Customer' represents a class named 'Customer'", answer:"a"},
+    {q:"Which of the following attributes are considered as business attributes?", a:"Security: ability to cope with malicious attacks", b:"None of others", c:"Availability: ability of a system to be available 24x7", d:"Usability: level of satisfaction from a human perspective", answer:"b"},
+    {q:"Which is correct about class diagram?", a:"Describing the static view of the system", b:"Describing a set of objects", c:"Describing the classes and their relationship", d:"Describing the classes and their relationship, and the static view of the system", answer:"d"},
+    {q:"There is a one-to-one correspondence between the elements of the static structure and the elements of the runtime structure for the same design project.", a:"True", b:"False", answer:"b"},
+    {q:"Public interface of a class consists of the following:", a:"aggregation and composition relationship", b:"private attributes", c:"private operations", d:"public attributes and public operations", answer:"d"},
+    {q:"Which among the following best describes encapsulation?", a:"It is a way of combining various data members into a single unit", b:"It is a way of combining various member functions into a single unit", c:"It is a way of combining various data members and member functions into a single unit which can operate on any data", d:"It is a way of combining various data members and member functions that operate on those data members into a single unit", answer:"d"},
+    {q:"Which of the following are NOT key components of an architectural style?", a:"Operations", b:"Elements", c:"Constraints", d:"Connectors", answer:"a"},
+    {q:"Information hiding can also be termed as:", a:"Inheritance", b:"Abstraction", c:"Encapsulation", d:"Data hiding", answer:"c"},
+    {q:"Identify the incorrect statement:", a:"The architectural design embodies earliest decisions that have a decisive impact on the ultimate success of the software product", b:"Software Architecture bridges between requirements and implementation", c:"Software architecture plays a very important role in software development.", d:"SDD contains a set of rules, constraints, and patterns of how to structure a system into a set of elements and connectors.", answer:"d"},
+    {q:"Which is correct about state diagram?", a:"Modeling the dynamic view of the system", b:"Describing the internal behaviour of the system, modeling the dynamic view of the system", c:"Describing the internal behaviour of the system", d:"Describing the information flows in the system", answer:"b"},
+    {q:"Identify the incorrect statement about Software architecture", a:"Software architecture also specifies the guidelines for how to write the source code.", b:"The design of software architecture must conform to the functional and non-functional requirements of the software project", c:"Software architecture describes the collection of Components, Connections and Interactions between these components", d:"Software architecture is a high-level abstraction of a software system by employing decomposition, composition, architectural styles, and quality attributes", answer:"a"},
+    {q:"Which of the following structures describe the dynamic properties of software architecture?", a:"Software deployment structure", b:"Software management structure", c:"Software code structure", d:"Software runtime structure", answer:"d"},
+    {q:"What is an alternative sequence in a use case?", a:"A sequence that describes interactions with a secondary actor", b:"A sequence that is different from the main sequence", c:"A sequence that describes an error case", d:"A sequence that describes interactions with a primary actor", answer:"b"},
+    {q:"Which of these statements about Component Diagrams is true?", a:"They give a dynamic view of the system", b:"They are useful to clarify the artifacts that will be produced from development", c:"They do not show third-party libraries", d:"They clarify dependency relationships", answer:"d"},
+    {q:"What is the purpose of a stereotype in class structuring?", a:"To label a class according to its class structuring criterion", b:"To identify the objects that belong to the same class", c:"To distinguish between external objects and software objects", d:"To identify the association between two classes", answer:"a"},
+    {q:"Which of these UML diagrams are likely to be part of the process view? (Select all that apply)", a:"Activity diagram", b:"Class diagram", c:"Sequence Diagram", d:"State Diagram", answer:"ac"},
+    {q:"Which of the following is a common messaging pattern in client/server relationships?", a:"one-way", b:"solicit-response", c:"handshake", d:"request-response", answer:"d"},
+    {q:"What are the two major styles of SOAP requests? (Select all that apply)", a:"RPC style", b:"request-response", c:"document style", d:"envelope", answer:"ac"},
+    {q:"A whole/part relationship is a generalization/specialization hierarchy", a:"True", b:"False", answer:"b"},
+    {q:"Which of these can be found in Common Object Request Broker Architecture (CORBA)? (Select all that apply)", a:"object request broker", b:"facilities", c:"client and server stubs", d:"interface definition language", answer:"abd"},
+    {q:"Which of these is an advantage of event-based architecture?", a:"Events trigger responses in a predictable manner", b:"Events are processed with more efficiency", c:"All interactions happen synchronously", d:"Event generators and event consumers are loosely coupled", answer:"d"},
+    {q:"Divide-and-conquer is a suitable methodology for architecture design", a:"True", b:"False", answer:"a"},
+    {q:"Architecture design is about choosing the right single architecture style for a project", a:"True", b:"False", answer:"b"},
+    {q:"Software architecture design involves many software design methodologies and architecture styles.", a:"True", b:"False", answer:"a"},
+    {q:"The purpose of the software design phase is to produce a software requirement specification.", a:"True", b:"False", answer:"b"},
+    {q:"Object-oriented design is a design methodology.", a:"True", b:"False", answer:"a"},
+    {q:"Software architecture is a static software structure description.", a:"True", b:"False", answer:"b"},
+    {q:"Software quality attributes must satisfy functional requirements.", a:"True", b:"False", answer:"b"},
+    {q:"Architecture styles contribute to software quality attributes.", a:"True", b:"False", answer:"a"},
+    {q:"Software architecture design is based on the software requirement specification.", a:"True", b:"False", answer:"a"},
+    {q:"Which of the following structures describe the static properties of software architecture? (Select all that apply)", a:"Software code structure", b:"Software runtime structure", c:"Software deployment structure", d:"Software management structure", answer:"acd"},
+    {q:"Deployment decisions should be reflected in early architecture designs.", a:"True", b:"False", answer:"b"}
   ]}
 ];
 
@@ -425,7 +571,7 @@ function buildCards(indexes) {
   return out;
 }
 
-let allCards = buildCards([...Array(20).keys()]);
+let allCards = buildCards([...Array(21).keys()]);
 let cards    = [...allCards];
 let current  = 0;
 const answered = {}; // key -> chosen letter | 'revealed'
@@ -434,7 +580,7 @@ function cardKey(c) { return `${c.ci}_${c.qNum}`; }
 
 function loadChapter() {
   const val = document.getElementById('chapterSelect').value;
-  const idx = val === 'all' ? [...Array(20).keys()] : [parseInt(val)];
+  const idx = val === 'all' ? [...Array(21).keys()] : [parseInt(val)];
   allCards = buildCards(idx); cards = [...allCards]; current = 0; renderCard();
 }
 
@@ -454,11 +600,11 @@ function renderCard() {
 
   if (c.type === 'full') {
     const d = c.data;
-    const opts = ['a','b','c','d'].map(k => {
+    const opts = ['a','b','c','d'].filter(k => d[k]).map(k => {
       let cls = 'option' + (ans ? ' disabled' : '');
       if (ans) {
-        if (k === d.answer)   cls += ' correct';
-        else if (k === ans)   cls += ' wrong';
+        if (d.answer.includes(k)) cls += ' correct';
+        else if (k === ans)       cls += ' wrong';
       }
       const click = ans ? '' : `onclick="checkAnswer('${k}')"`;
       return `<div class="${cls}" ${click}><span class="option-key">${k.toUpperCase()}</span><span>${d[k]}</span></div>`;
